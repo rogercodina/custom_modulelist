@@ -1,0 +1,4 @@
+name = Custom module list
+description = Creates a block and a page with plain text module list with no anable/disable/configure/help links for desired roles.
+package = Administration
+core = 7.x

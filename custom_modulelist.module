@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * Defines a new permission
+ *
+ * Implements hook_permission().
+ */
+function custom_modulelist_permission() {
+  return array(
+    'see modules list' => array(
+      'title' => t('See modules list'),
+      'description' => t("User can see module list but can't enable or disable modules"),
+      'restrict access' => TRUE
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function custom_modulelist_menu() {
+  $items = array();
+
+  $items['admin/module-list'] = array(
+    'title' => "Module list",
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_modulelist_form'),
+    'access callback' => TRUE,
+    'access arguments' => array('see modules list'),
+  );
+
+  return $items;
+}
+
+
+/*
+ * Formulario para mostrar la lista de modulos
+ */
+function custom_modulelist_form($form, &$form_state) {
+  $form['contact_information'] = array(
+    '#markup' => custom_modulelist_get_contents(),
+  );
+  return $form;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function custom_modulelist_block_info() {
+  $blocks['custom_modulelist'] = array(
+    // The name that will appear in the block list.
+    'info' => t("Module list"),
+    // Default setting.
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+  return $blocks;
+}
+
+
+/**
+ * Implements hook_block_view().
+ *
+ * Prepares the contents of the block.
+ */
+function custom_modulelist_block_view($delta = '') {
+  if ($delta == 'custom_modulelist'){
+      $block['subject'] = t("Custom module list");
+      $block['content'] = custom_modulelist_get_contents();
+      
+      return $block;
+  }
+}
+
+/*
+ * Outputs the module's list
+ */
+function custom_modulelist_get_contents() {
+    if(user_access('see modules list')) {
+      $output = '<div id="custom_modulelist"><div class="container">';
+      $output .= '<ul>';
+      $list = module_list();
+      foreach($list as $module_name) {
+        $output .= '<li>';
+        $output .= $module_name;
+        $output .= '</li>';
+      }
+      $output .= '</ul>';
+      $output .= '</div></div>';
+    }
+    else {
+	  $output = t('Permission denied');
+    }
+    return $output;
+}
+
+/**
+ * Implements hook_help().
+ *
+ * Some help for users.
+ */
+function custom_modulelist_help($path, $arg) {
+  switch ($path) {
+    case 'admin/setting/custom_modulelist':
+
+      $out = 'Creates a block and a page (admin/module-list) with plain text module list with no anable/disable/configure/help links for desired roles.';
+      break;
+
+    case 'admin/help#custom_modulelist';
+
+      $out = '<p>Creates a block and a page (admin/module-list) with plain text module list with no anable/disable/configure/help links for desired roles.</p>';
+      break;
+
+    default:
+      $out = '';
+      break;
+
+  }
+  return $out;
+}
