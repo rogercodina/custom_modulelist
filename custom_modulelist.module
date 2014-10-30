@@ -80,8 +80,12 @@ function custom_modulelist_get_contents() {
       $output .= '<ul>';
       $list = module_list();
       foreach($list as $module_name) {
+        $path = drupal_get_path('module', $module_name) . '/' . $module_name . '.info';
+        $info = drupal_parse_info_file($path);
+        $version = isset($info['version']) ? $info['version'] : 'Version unknown';
+        $description = isset($info['description']) ? $info['description'] : 'No description';
         $output .= '<li>';
-        $output .= $module_name;
+        $output .= '<strong>' . $module_name . '</strong> (' . $version . ') => '. $description;
         $output .= '</li>';
       }
       $output .= '</ul>';
